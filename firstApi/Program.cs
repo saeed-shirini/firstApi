@@ -1,6 +1,7 @@
 using AutoMapper;
 using firstApi;
 using firstApi.Services;
+using firstApi.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +17,11 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddControllers();
 
-//
+var jwtSettingSection = builder.Configuration.GetSection("JwtSetting");
+builder.Services.Configure<JwtSettings>(jwtSettingSection);
+
+var jwtSetting = jwtSettingSection.Get<JwtSettings>();
+
 builder.Services.AddAuthentication(option =>
 {
     option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -29,10 +34,10 @@ builder.Services.AddAuthentication(option =>
         ValidateIssuer = true,
         ValidateAudience = true,
         ValidateLifetime = true,
-        ValidIssuer = builder.Configuration.GetSection("JwtSetting").GetValue<string>("ValidIssuer"),
-        ValidAudience = builder.Configuration.GetSection("JwtSetting").GetValue<string>("ValidAudience"),
+        ValidIssuer = jwtSetting.ValidIssuer,
+        ValidAudience = jwtSetting.ValidAudience,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtSetting").GetValue<string>("IssuerSigningKey")))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSetting.IssuerSigningKey))
     };
 });
 

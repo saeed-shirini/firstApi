@@ -1,6 +1,7 @@
 ﻿using firstApi.Models;
 using firstApi.UserModel;
 using firstApi.Utils;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -11,10 +12,12 @@ namespace firstApi.Services
     public class AuthService : IAuthService
     {
         private readonly DatabaseContext _context;
+        private readonly JwtSettings _jwtSetting;
 
-        public AuthService(DatabaseContext context)
+        public AuthService(DatabaseContext context, IOptions<JwtSettings> jwtSettings)
         {
             _context = context;
+            _jwtSetting = jwtSettings.Value;
         }
 
         public bool CheckIsExistMobile(string mobile)
@@ -48,10 +51,10 @@ namespace firstApi.Services
                     new Claim(ClaimTypes.Name,getUserByMobile.FullName),
                     new Claim(ClaimTypes.Role,getUserByMobile.Role)
                 }),
-                Expires = DateTime.Now.AddDays(7),
-                Issuer = "first api",
-                Audience = "customers",
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes("this is testthis is testthis is testthis is testthis is testthis is testthis is test")),SecurityAlgorithms.Aes256CbcHmacSha512)
+                Expires = DateTime.UtcNow.AddDays(7),
+                Issuer = _jwtSetting.ValidIssuer,
+                Audience = _jwtSetting.ValidAudience,
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSetting.IssuerSigningKey)),SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(descriptor);
             var result = tokenHandler.WriteToken(token);

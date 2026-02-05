@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using firstApi.UserModel;
+using firstApi.Utils;
+using Microsoft.Extensions.Options;
 
 namespace firstApi.Controllers
 {
@@ -11,11 +13,11 @@ namespace firstApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+ 
 
         public AuthController(IAuthService authService)
         {
             _authService = authService;
-            
         }
 
         [HttpPost("[action]")]

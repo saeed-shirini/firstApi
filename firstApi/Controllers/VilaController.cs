@@ -2,6 +2,7 @@
 using firstApi.Dto;
 using firstApi.Models;
 using firstApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,8 @@ namespace firstApi.Controllers
         /// </summary>
         /// <param></param>
         /// <returns></returns>
+        /// 
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK,Type= typeof(VilaDto))]
         public IActionResult GetAll()
